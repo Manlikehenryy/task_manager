@@ -1,0 +1,128 @@
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A datetime and timezone string in ISO 8601 format `Y-m-dTH:i:sO`, e.g. `2020-04-20T13:53:12+02:00`."
+scalar DateTimeTz @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeTz")
+
+
+type Query {
+    users: [User!]! @all(model: "App\\Models\\User") @guard(with: ["api"])
+    userspaginate: [User!]! @all(model: "App\\Models\\User") @guard(with: ["api"])
+    user(email: String! @eq): User @find(model: "App\\Models\\User") @guard(with: ["api"])
+    tasks: [Task!]! @all(model: "App\\Models\\Task") @guard(with: ["api"])
+    findTask(id: Int!, user_id: String!): Task @field(resolver: "App\\GraphQL\\Queries\\FindTask@__invoke") @guard(with: ["api"])
+    categories: [Category!]! @all(model: "App\\Models\\Category") @guard(with: ["api"])
+    findCategory(id: Int!, user_id: String!): Category @field(resolver: "App\\GraphQL\\Queries\\FindCategory@__invoke") @guard(with: ["api"])
+    getTask(keyword: String!, user_id: String!): [Task!]! @field(resolver: "App\\GraphQL\\Queries\\GetTask@__invoke") @guard(with: ["api"])
+    filterTask(status: String!, user_id: String!, category_id: ID!): [Task!]! @field(resolver: "App\\GraphQL\\Queries\\FilterTask@__invoke") @guard(with: ["api"])
+    authUser: User @guard(with: ["api"]) @auth
+    countTask(user_id: String!): CountedTasks! @field(resolver: "App\\GraphQL\\Queries\\CountTask@__invoke") @guard(with: ["api"])
+}
+
+type Mutation {
+    createUser(
+        name: String! @rules(apply: ["required", "min:4"]),
+        email: String! @rules(apply: ["required","email", "unique:users"]),
+        password: String! @rules(apply: ["min:4"]) @hash
+    ): User! @create(model: "App\\Models\\User") 
+
+    deleteTask(id: ID!, user_id: String!): Task @field(resolver: "App\\GraphQL\\Mutations\\DeleteTask@__invoke") @guard(with: ["api"])
+    deleteCategory(id: ID!, user_id: String!): Category@field(resolver: "App\\GraphQL\\Mutations\\DeleteCategory@__invoke") @guard(with: ["api"])
+
+       createTask(
+        title: String! @rules(apply: ["required"]),
+        description: String! @rules(apply: ["required"]),
+        due_date: Date! @rules(apply: ["required"]),
+        status: String! @rules(apply: ["required"]),
+        user_id: String! @rules(apply: ["required"]),
+        category_id: ID! @rules(apply: ["required"])
+    ): Task! @create(model: "App\\Models\\Task") @guard(with: ["api"])
+
+       updateTask(
+        id: ID!,
+        title: String! @rules(apply: ["required"]),
+        description: String! @rules(apply: ["required"]),
+        due_date: Date! @rules(apply: ["required"]),
+        status: String! @rules(apply: ["required"]),
+        user_id: String! @rules(apply: ["required"]),
+        category_id: ID! @rules(apply: ["required"])): Task! @field(resolver: "App\\GraphQL\\Mutations\\UpdateTask@__invoke") @guard(with: ["api"])
+
+        createCategory(
+        title: String! @rules(apply: ["required"]),
+        user_id: String! @rules(apply: ["required"]),
+    ): Category! @create(model: "App\\Models\\Category") @guard(with: ["api"])
+
+       updateCategory(
+        id: ID!,
+        title: String! @rules(apply: ["required"]),
+        user_id: String! @rules(apply: ["required"])
+       ): Category! @field(resolver: "App\\GraphQL\\Mutations\\UpdateCategory@__invoke") @guard(with: ["api"])
+
+    login(input: LoginInput @spread): AuthPayload! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\Login@resolve")
+    refreshToken(input: RefreshTokenInput @spread): RefreshTokenPayload! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\RefreshToken@resolve")
+    logout: LogoutResponse! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\Logout@resolve")
+    forgotPassword(input: ForgotPasswordInput! @spread): ForgotPasswordResponse! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\ForgotPassword@resolve")
+    updateForgottenPassword(input: NewPasswordWithCodeInput @spread): ForgotPasswordResponse! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\ResetPassword@resolve")
+    register(input: RegisterInput @spread): RegisterResponse! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\Register@resolve")
+    socialLogin(input: SocialLoginInput! @spread): AuthPayload! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\SocialLogin@resolve")
+    verifyEmail(input: VerifyEmailInput! @spread): AuthPayload! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\VerifyEmail@resolve")
+    updatePassword(input: UpdatePassword! @spread): UpdatePasswordResponse! @field(resolver: "Joselfonseca\\LighthouseGraphQLPassport\\GraphQL\\Mutations\\UpdatePassword@resolve") @guard(with: ["api"])
+}
+
+
+
+
+type CountedTasks {
+  not_started: Int!
+  in_progress: Int!
+  completed: Int!
+}
+
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    password: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    tasks: [Task!]! @hasMany
+    categories: [Category!]! @hasMany
+   
+}
+
+type Category {
+    id: ID!
+    title: String!
+    user: User! @belongsTo
+    tasks: [Task!]! @hasMany
+    created_at: DateTime!
+}
+
+type Task {
+    id: ID!
+    title: String!
+    description: String!
+    due_date: Date!
+    status: String!
+    category_id:ID!
+    user: User! @belongsTo
+    category: Category! @belongsTo
+}
+
+type Post {
+    id: ID!
+    title: String!
+    content: String!
+    author: User! @belongsTo
+    comments: [Comment!]! @hasMany
+}
+
+type Comment {
+    id: ID!
+    reply: String!
+    post: Post! @belongsTo
+}
