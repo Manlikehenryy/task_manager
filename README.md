@@ -62,7 +62,7 @@ php artisan migrate
 ```
 php artisan passport:install
 ```
-### The output should look like this
+### The output should look like this, copy the client secret that was generated
 ```
 Encryption keys generated successfully.
 Personal access client created successfully.
@@ -73,7 +73,7 @@ Client ID: 2
 Client secret: vlD9wvLCL8Pv32uHghrDcTcdgbzpGmC0KKkV97At
 ```
 
-### put the encryption key in the .env file
+### put the client secret in the .env file, as shown below
 ```
 PASSPORT_CLIENT_ID=2
 PASSPORT_CLIENT_SECRET=vlD9wvLCL8Pv32uHghrDcTcdgbzpGmC0KKkV97At
