@@ -1,0 +1,122 @@
+
+<script setup>
+    import { RouterLink } from 'vue-router';
+</script>
+<template>
+
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <!-- <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company"> -->
+        <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create an account</h2>
+      </div>
+    
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form class="space-y-6" action="#" @submit.prevent="authUser()">
+    
+           
+    
+          <div>
+            <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
+            <div class="mt-2">
+              <input id="email" v-model="email" name="email" type="email" autocomplete="email" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+    
+          <div>
+            <div class="flex items-center justify-between">
+              <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+         
+            </div>
+            <div class="mt-2">
+              <input id="password" v-model="password" name="password" type="password" autocomplete="current-password" required  class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+    
+         
+          <div>
+            <button type="submit"  style="box-shadow: 0 4px 8px rgba(0,0,0,0.2);background-image: linear-gradient(to bottom right,#2193b0 , #6dd5ed);" class="flex w-full justify-center rounded-md  px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">Sign up</button>
+          </div>
+        </form>
+    
+        <p class="mt-10 text-center text-sm text-gray-500">
+      Don't have an account?
+      <RouterLink to="/register">
+        <div href="" style="color: #6dd5ed;" class="font-semibold leading-6">Register</div>
+    
+     </RouterLink>
+    </p>
+    
+      </div>
+    </div>
+    
+    </template>
+    
+    <script>
+    import gql from 'graphql-tag';
+    import { onLogin } from '@/vue-apollo';
+
+        export default {
+            data(){
+                return {
+                  
+                    email:'',
+                    password:'',
+                    token: null,
+                    user_id: null,
+                    name: null
+                   
+                }
+            },
+           
+            methods: {
+            async authUser (){
+      
+              this.$apollo.mutate({
+             // Query
+             mutation:  gql`
+             mutation($data: LoginInput!){
+             login(data: $data){
+             access_token
+             name
+             email
+             }
+             }`,
+             // Parameters
+             variables: {
+                data: {
+              email: this.email,
+              password: this.password
+             }
+             }
+             }).then((res)=>{
+                this.token = res.data.login.access_token;
+                this.user_id = res.data.login.email
+                this.name = res.data.login.name
+
+                localStorage.setItem('id',this.user_id)
+                localStorage.setItem('name',this.name)
+
+                onLogin(this.$apollo.provider.defaultClient,this.token)
+                 
+                 this.$router.push({
+                     name: "home"
+                 })
+               }).catch((err)=>{
+               console.log(err.graphQLErrors)
+               })
+       
+    }
+            }
+        }
+    
+    
+       
+    
+    
+    
+    
+    
+    
+    </script>
+    
+    

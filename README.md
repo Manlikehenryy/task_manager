@@ -1,5 +1,19 @@
 
-install Git, then open a new terminal in Vscode or your code editor and run "git clone https://github.com/Manlikehenryy/task_manager.git"
+
+### install Git
+```
+https://git-scm.com/downloads
+```
+### Open command prompt and clone the repository
+```
+git clone https://github.com/Manlikehenryy/task_manager.git
+```
+
+### Enter into project folder
+```
+cd task_manager
+```
+
 
 # backend
 
@@ -32,6 +46,14 @@ click on the admin button beside MySQL
 ```
 create a new database, name it "task_manager"
 ```
+### create environment file
+```
+cp .env.example .env
+```
+### Generate key
+```
+php artisan key:generate
+```
 ### Migration
 ```
 php artisan migrate
@@ -47,9 +69,9 @@ php artisan serve
 ```
 https://nodejs.org/en/download
 ```
-### Vue code
+### Vue code, open a new command prompt tab or window
 ```
-cd ui
+cd task_manager/ui
 ```
 ### Project setup
 ```
