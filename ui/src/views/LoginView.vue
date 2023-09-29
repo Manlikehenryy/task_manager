@@ -61,9 +61,6 @@
                   
                     email:'',
                     password:'',
-                    token: null,
-                    user_id: null,
-                    name: null
                    
                 }
             },
@@ -74,33 +71,31 @@
               this.$apollo.mutate({
              // Query
              mutation:  gql`
-             mutation($data: LoginInput!){
-             login(data: $data){
+             mutation($input: LoginInput!){
+             login(input: $input){
              access_token
-             name
-             email
+             user{
+              email
+              name
+             }
              }
              }`,
              // Parameters
              variables: {
-                data: {
-              email: this.email,
+                input: {
+              username: this.email,
               password: this.password
              }
              }
              }).then((res)=>{
-                this.token = res.data.login.access_token;
-                this.user_id = res.data.login.email
-                this.name = res.data.login.name
-
-                localStorage.setItem('id',this.user_id)
-                localStorage.setItem('name',this.name)
-
-                onLogin(this.$apollo.provider.defaultClient,this.token)
+              localStorage.setItem('id',res.data.login.user.email)
+              localStorage.setItem('name',res.data.login.user.name)
+              onLogin(this.$apollo.provider.defaultClient,res.data.login.access_token);
                  
+
                  this.$router.push({
                      name: "home"
-                 })
+                 });
                }).catch((err)=>{
                console.log(err.graphQLErrors)
                })

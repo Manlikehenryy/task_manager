@@ -105,6 +105,10 @@ npm run serve
 ```
 http://localhost:8080
 ```
+### Note
+```
+you might need to refresh the page after adding a task or category
+```
 
 
 
