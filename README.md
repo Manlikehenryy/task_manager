@@ -63,7 +63,7 @@ php artisan migrate
 php artisan passport:install
 ```
 ### The output should look like this
-
+```
 Encryption keys generated successfully.
 Personal access client created successfully.
 Client ID: 1
@@ -71,13 +71,13 @@ Client secret: 0PjulEfVh9UBtJnYGpBOS7eku5MJmgFHPNaLTbMH
 Password grant client created successfully.
 Client ID: 2
 Client secret: vlD9wvLCL8Pv32uHghrDcTcdgbzpGmC0KKkV97At
-
+```
 
 ### put the encryption key in the .env file
-
+```
 PASSPORT_CLIENT_ID=2
 PASSPORT_CLIENT_SECRET=vlD9wvLCL8Pv32uHghrDcTcdgbzpGmC0KKkV97At
-
+```
 ### Start the backend server
 ```
 php artisan serve
